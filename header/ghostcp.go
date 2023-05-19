@@ -108,9 +108,11 @@ var MethodMap = map[string]uint32{
 
 var Logger *log.Logger
 
+var _logger = log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
 func logPrintln(level int, v ...interface{}) {
 	if LogLevel >= level {
-		fmt.Println(v)
+		_logger.Output(2, fmt.Sprintln(v...))
 	}
 }
 

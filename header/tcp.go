@@ -9,6 +9,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/macronut/ghostcp/tlsrecord"
 	"github.com/macronut/godivert"
 )
 
@@ -772,6 +773,29 @@ func TCPDaemon(address string, forward bool) {
 						} else if payloadLen > 0 {
 							hello := packet.Raw[ipheadlen+tcpheadlen:]
 							host_offset, host_length = getSNI(hello)
+							if host_length > 0 {
+								if record, err := tlsrecord.UnmarshalPlaintext(hello); err != nil {
+									logPrintln(3, fmt.Sprintf(
+										"%s:%d => \"%s\" TCP payload(%d) host_offset=%d host_length=%d, %s\n",
+										packet.DstIP(), tcpAddr.Port, hello[host_offset:host_offset+host_length],
+										len(hello), host_offset, host_length,
+										err,
+									))
+								} else {
+									logPrintln(3, fmt.Sprintf(
+										"%s:%d => \"%s\" TCP payload(%d) host_offset=%d host_length=%d, %s\n",
+										packet.DstIP(), tcpAddr.Port, hello[host_offset:host_offset+host_length],
+										len(hello), host_offset, host_length,
+										record,
+									))
+								}
+
+								if host_length == 1 {
+									logPrintln(3, fmt.Sprintf("!!!!\n%#02v\n", hello))
+								}
+							} else {
+
+							}
 						}
 					} else {
 						if info.Option&OPT_SAT != 0 && payloadLen > 0 {
@@ -1095,7 +1119,7 @@ func TCPDaemon(address string, forward bool) {
 					} else {
 						PortList4[srcPort] = nil
 					}
-					logPrintln(3, packet.DstIP(), tcpAddr.Port)
+					logPrintln(3, fmt.Sprintf("SYN %s:%d", packet.DstIP(), tcpAddr.Port))
 				}
 
 				_, err = winDivert.Send(packet)

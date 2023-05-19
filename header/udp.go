@@ -327,6 +327,10 @@ func DNSRecvDaemon() {
 					packet.CalcNewChecksum(winDivert)
 				} else if anCount > 0 {
 					logPrintln(2, qname, qtype)
+					if DNS == "" {
+						// continue
+						goto localdns
+					}
 					copy(rawbuf, packet.Raw[:ipheadlen+udpheadlen+off])
 					binary.BigEndian.PutUint16(rawbuf[ipheadlen+14:], uint16(anCount))
 					copy(rawbuf[ipheadlen+udpheadlen+off:], answers)
@@ -366,7 +370,7 @@ func DNSRecvDaemon() {
 					}
 				}
 			}
-
+			localdns:
 			_, err = winDivert.Send(packet)
 		}
 	}()
