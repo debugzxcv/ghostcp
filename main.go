@@ -7,7 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
+	// "runtime"
 
 	"github.com/chai2010/winsvc"
 	"github.com/macronut/ghostcp/header"
@@ -20,7 +20,7 @@ var ScanURL string = ""
 var ScanTimeout uint = 0
 
 func StartService() {
-	runtime.GOMAXPROCS(1)
+	// runtime.GOMAXPROCS(1)
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	if ghostcp.LogLevel > 0 {
